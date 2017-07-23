@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class CropController : MonoBehaviour
 {
+
+    WorldController WC;
+
     public enum CropState
     {
         Empty = 0,
@@ -15,18 +18,7 @@ public class CropController : MonoBehaviour
         Mature = 5
     }
 
-    public enum CropHealth
-    {
-        Dry = 0,
-        Fair = 1,
-        Ideal = 2,
-        Wet = 3,
-        DeadDry = 4,
-        DeadWet = 5,
-        Unripe = 6,
-        Ripe = 7
-    }
-
+    
     [SerializeField] private CropState _state;
     public CropState State
     {
@@ -46,6 +38,24 @@ public class CropController : MonoBehaviour
         }
     }
 
+    public int TotalStates
+    {
+        get { return Enum.GetNames(typeof(CropState)).Length; }
+    }
+
+
+    public enum CropHealth
+    {
+        Dry = 0,
+        Fair = 1,
+        Ideal = 2,
+        Wet = 3,
+        DeadDry = 4,
+        DeadWet = 5,
+        Unripe = 6,
+        Ripe = 7
+    }
+
     [SerializeField] private CropHealth _health;
     public CropHealth Health
     {
@@ -60,11 +70,7 @@ public class CropController : MonoBehaviour
         }
     }
 
-    public int TotalStates
-    {
-        get { return Enum.GetNames(typeof(CropState)).Length; }
-    }
-
+    
     [SerializeField] private GameObject[] models;
     [SerializeField] private GameObject progressBar;
     [SerializeField] private GameObject healthBar;
@@ -84,6 +90,15 @@ public class CropController : MonoBehaviour
     private float timeStateChanged = 0;
 
     private float debugVar = 0;
+
+    public Seed plantedSeed = null;
+
+    void Awake()
+    {
+        WC = WorldController.Instance;
+        WC.OnWorldStateChange += HandleWorldStateChange;
+
+    }
 
     private void Start()
     {
@@ -106,7 +121,7 @@ public class CropController : MonoBehaviour
         healthBar.transform.rotation = Camera.main.transform.rotation;
 
 
-        float healthProgress = -1.0f;
+        //float healthProgress = -1.0f;
         float progress = 0.0f;
         float duration = durations[(int)State];
 
@@ -145,8 +160,17 @@ public class CropController : MonoBehaviour
                     lastAction = Time.time;
                     wateringsDuringCurrentState = 0;
                     timeStateChanged = Time.time;
-                    State = CropState.Seeded;
 
+                    
+                    Seed seed = WC.PopSeed();
+                    if(seed) {
+                        plantSeed(seed);
+                        seed.UpdateSeedState(Seed.SeedState.Planted);
+                        State = CropState.Seeded;
+                    } else {
+                        Debug.Log("No Seeds");
+                    }
+                    
                 }
 
                 progressBar.SetActive(false);
@@ -349,6 +373,19 @@ public class CropController : MonoBehaviour
         
     }
 
+    public void plantSeed(Seed seed)
+    {
+        plantedSeed = seed;
+
+  
+        //TODO: update with models rather than just change the color
+        models[(int)CropState.Seeded].GetComponent<MeshRenderer>().material.SetColor("_Color", seed.GetColor());
+        models[(int)CropState.Young].GetComponent<MeshRenderer>().material.SetColor("_Color", seed.GetColor());
+        models[(int)CropState.Mature].GetComponent<MeshRenderer>().material.SetColor("_Color", seed.GetColor());
+
+
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (!ValidLayer(other)) { return; }
@@ -417,5 +454,10 @@ public class CropController : MonoBehaviour
         }
 
         healthBar.GetComponent<Renderer>().material.SetFloat("_Cutoff", Mathf.InverseLerp(1, 0, progress));
+    }
+
+    private void HandleWorldStateChange()
+    {
+
     }
 }

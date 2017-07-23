@@ -10,11 +10,11 @@ public class WorldController
 {
 
     private int dollars = 100;
-    private List<Inventory> inventory = new List<Inventory>();
+    private List<Seed> seedInventory = new List<Seed>();
 
     protected WorldController() { }
     private static WorldController instance = null;
-    public event OnStateChangeHandler OnStateChange;
+    public event OnStateChangeHandler OnWorldStateChange;
     public GameState gameState { get; private set; }
 
     public static WorldController Instance
@@ -34,7 +34,7 @@ public class WorldController
     public void SetGameState(GameState state)
     {
         this.gameState = state;
-        OnStateChange();
+        OnWorldStateChange();
     }
 
     public void OnApplicationQuit()
@@ -42,10 +42,24 @@ public class WorldController
         WorldController.instance = null;
     }
 
-    public void Equip(Inventory item)
+    public void EquipSeed(Seed seed)
     {
-        inventory.Add(item);
-        Debug.Log(inventory.Count);
+        seedInventory.Add(seed);
+        Debug.Log(seedInventory.Count);
+    }
+
+    public Seed PopSeed()
+    {
+        if(seedInventory.Count < 1) {
+            return null;
+        }
+
+        int i = seedInventory.Count - 1;
+
+        Seed seed = seedInventory[i];
+        seedInventory.RemoveAt(i);
+        return seed;
+
     }
 
     public bool CanAfford(int amount)
