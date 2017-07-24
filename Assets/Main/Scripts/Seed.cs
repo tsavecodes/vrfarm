@@ -150,6 +150,26 @@ public class Seed : MonoBehaviour
         return colors[(int)Type];
     }
 
+    public string GetSeedName()
+    {
+        switch(Type)
+        {
+            case SeedType.Corn:
+                return "Corn";
+            case SeedType.Carrot:
+                return "Carrot";
+            case SeedType.Wheat:
+                return "Wheat";
+            case SeedType.Potato:
+                return "Potato";
+            case SeedType.Tomato:
+                return "Tomato";
+
+        }
+
+        return "?";
+    }
+
 
     private void OnTriggerEnter(Collider other)
     {

@@ -9,12 +9,13 @@ public delegate void OnStateChangeHandler();
 public class WorldController
 {
 
-    private int dollars = 100;
-    private List<Seed> seedInventory = new List<Seed>();
+    public int dollars = 100;
+    public List<Seed> seedInventory = new List<Seed>();
 
     protected WorldController() { }
     private static WorldController instance = null;
     public event OnStateChangeHandler OnWorldStateChange;
+    public event OnStateChangeHandler OnInventoryChange;
     public GameState gameState { get; private set; }
 
     public static WorldController Instance
@@ -46,6 +47,7 @@ public class WorldController
     {
         seedInventory.Add(seed);
         Debug.Log(seedInventory.Count);
+        OnInventoryChange();
     }
 
     public Seed PopSeed()
@@ -58,6 +60,7 @@ public class WorldController
 
         Seed seed = seedInventory[i];
         seedInventory.RemoveAt(i);
+        OnInventoryChange();
         return seed;
 
     }
@@ -85,6 +88,11 @@ public class WorldController
     {
         dollars += amount;
         return dollars;
+    }
+
+    private void UpdateInventory()
+    {
+        OnInventoryChange();
     }
 
 
