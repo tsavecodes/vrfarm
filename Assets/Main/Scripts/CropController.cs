@@ -188,6 +188,8 @@ public class CropController : MonoBehaviour
                 if (isInteractable && Input.GetKeyDown(KeyCode.E))
                 {
                     Debug.Log("Water!");
+
+                    WC.UseWater();
                     
                     totalWaterings += 1;
                     wateringsDuringCurrentState += 1;

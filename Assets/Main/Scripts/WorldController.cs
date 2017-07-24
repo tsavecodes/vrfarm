@@ -10,12 +10,15 @@ public class WorldController
 {
 
     public int dollars = 100;
+    public int water = 3;
+    public int maxWater = 10;
     public List<Seed> seedInventory = new List<Seed>();
 
     protected WorldController() { }
     private static WorldController instance = null;
     public event OnStateChangeHandler OnWorldStateChange;
     public event OnStateChangeHandler OnInventoryChange;
+    public event OnStateChangeHandler OnWaterChange;
     public GameState gameState { get; private set; }
 
     public static WorldController Instance
@@ -90,10 +93,30 @@ public class WorldController
         return dollars;
     }
 
+    public void AddWater(int amount)
+    {
+        water += amount;
+        if(water > maxWater) { water = maxWater; }
+        OnWaterChange();
+    }
+    public void UseWater()
+    {
+        if(water <= 0)
+        {
+            Debug.Log("No Water");
+            return;
+        }
+
+        water--;
+        OnWaterChange();
+    }
+
     private void UpdateInventory()
     {
         OnInventoryChange();
     }
+
+ 
 
 
 }

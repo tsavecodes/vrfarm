@@ -77,6 +77,6 @@ public class UIInventory : MonoBehaviour {
 
     private void HandleWorldStateChange()
     {
-
+        return;
     }
 }
